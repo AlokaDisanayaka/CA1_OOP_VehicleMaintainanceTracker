@@ -1,33 +1,31 @@
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
-public final class ServiceRecord implements Comparable <ServiceRecord>{
+public final class ServiceRecord extends RecordBase implements Comparable<ServiceRecord>{
 
     //fields
     private String ownerName;
-    private String vehicleModel;
-    private String registration;
-    private VehicleCategory category;
-    private VehicleSubType subtype;
-    private int mileage;
+    private String workOrderId;
+    private String serviceType;
     private double serviceCost;
     private boolean underWarranty;
     private LocalDate serviceDate;
     private LocalDateTime startTime;
+    private Vehicle vehicle;
+
 
     //constructor with validation
-    public ServiceRecord(String ownerName, String vehicleModel, String registration, VehicleCategory category, VehicleSubType subtype, int mileage, double serviceCost, boolean underWarranty, LocalDate serviceDate, LocalDateTime startTime)
+    public ServiceRecord(String ownerName, String workOrderId, String serviceType, double serviceCost, boolean underWarranty, LocalDate serviceDate, LocalDateTime startTime, Vehicle vehicle)
     {
-        this.ownerName     = requireNonBlank(ownerName, "ownerName");
-        this.vehicleModel  = requireNonBlank(vehicleModel, "vehicleModel");
-        this.registration  = requireNonBlank(registration, "registration");
-        this.category      = Objects.requireNonNull(category, "category");
-        this.subtype       = Objects.requireNonNull(subtype, "subtype");
-        this.mileage       = requireNonNegative(mileage, "mileage");
-        this.serviceCost   = requirePositive(serviceCost, "serviceCost");
+        this.ownerName = requireNonBlank(ownerName, "ownerName");
+        this.workOrderId = requireNonBlank(workOrderId, "workOrderId");
+        this.serviceType = requireNonBlank(serviceType, "serviceType");
+        this.serviceCost = requirePositive(serviceCost, "serviceCost");
         this.underWarranty = underWarranty;
-        this.serviceDate   = Objects.requireNonNull(serviceDate, "serviceDate");
-        this.startTime     = Objects.requireNonNull(startTime, "startTime");
+        this.serviceDate = Objects.requireNonNull(serviceDate, "serviceDate");
+        this.startTime = Objects.requireNonNull(startTime, "startTime");
+        this.vehicle = Objects.requireNonNull(vehicle, "vehicle");
+
 
         // the date part of startTime should match the serviceDate
         if (!startTime.toLocalDate().equals(serviceDate))
@@ -35,7 +33,7 @@ public final class ServiceRecord implements Comparable <ServiceRecord>{
             throw new IllegalArgumentException("startTime date must match serviceDate");
         }
 
-        //reject future service dates (as the date of service cannot be in the future)
+        //do not take in future service dates (as the date of service cannot be in the future)
          if (serviceDate.isAfter(LocalDate.now()))
         {
            throw new IllegalArgumentException("serviceDate cannot be in the future");
@@ -48,31 +46,19 @@ public final class ServiceRecord implements Comparable <ServiceRecord>{
     {
         return this.ownerName;
     }
-    public String getVehicleModel()
+    public String getWorkOrderId()
     {
-        return this.vehicleModel;
+        return this.workOrderId;
     }
-    public String getRegistration()
+    public String getServiceType()
     {
-        return this.registration;
-    }
-    public VehicleCategory getCategory()
-    {
-        return this.category;
-    }
-    public VehicleSubType getSubtype()
-    {
-        return this.subtype;
-    }
-    public int getMileage()
-    {
-        return this.mileage;
+        return this.serviceType;
     }
     public double getServiceCost()
     {
         return this.serviceCost;
     }
-    public boolean isUnderWarranty()
+    public boolean getUnderWarranty()
     {
         return this.underWarranty;
     }
@@ -83,6 +69,10 @@ public final class ServiceRecord implements Comparable <ServiceRecord>{
     public LocalDateTime getStartTime()
     {
         return this.startTime;
+    }
+    public Vehicle getVehicle()
+    {
+        return this.vehicle;
     }
     //compareTo
     public int compareTo(ServiceRecord other)
@@ -102,7 +92,7 @@ public final class ServiceRecord implements Comparable <ServiceRecord>{
         }
 
         //compare by registration
-        return this.registration.compareToIgnoreCase(other.registration);
+        return this.vehicle.getRegistration().compareToIgnoreCase(other.vehicle.getRegistration());
     }
 
     //to string
@@ -111,51 +101,18 @@ public final class ServiceRecord implements Comparable <ServiceRecord>{
        String output = "";
        output =output+"-------------------------------\n";
        output =output+"Owner Name      : " + ownerName + "\n";
-       output =output+"Vehicle Model   : " + vehicleModel + "\n";
-       output =output+"Registration    : " + registration + "\n";
-       output =output+"Category/Subtype: " + category + " / " + subtype + "\n";
-       output =output+"Mileage         : " + mileage + " km\n";
-       output =output+"Service Cost    : €" + serviceCost + "\n";
+       output =output+"Work Order ID   : " + workOrderId + "\n";
+       output =output+"Service Type    : " + serviceType + "\n";
+       output =output+"Service Cost    : " + serviceCost + "\n";
        output =output+"Under Warranty  : " + underWarranty + "\n";
        output =output+"Service Date    : " + serviceDate + "\n";
        output =output+"Start Time      : " + startTime.toLocalTime() + "\n";
+       output =output+"Vehicle Info    : " + vehicle + "\n";
        output =output+"-------------------------------";
        return output;
 
    }
-    //validations for constructors
-    private static String requireNonBlank(String value, String field)
-    {
-        if (value == null)
-        {
-            throw new IllegalArgumentException(field + " must not be null");
-        }
-        //The trim() method removes whitespace from both ends of a string. Note: This method does not change the original string.
-        String trimmed = value.trim();
-        if (trimmed.isEmpty())
-        {
-            throw new IllegalArgumentException(field + " must not be blank");
-        }
-        return trimmed;
-    }
 
-    private static int requireNonNegative(int value, String field)
-    {
-        if (value < 0)
-        {
-            throw new IllegalArgumentException(field + " must be >= 0");
-        }
-        return value;
-    }
-
-    private static double requirePositive(double value, String field) {
-        if (value <= 0.0)
-        {
-            throw new IllegalArgumentException(field + " must be > 0");
-        }
-        return value;
-    }
-
-    // equals/hashCode will be added in Stage 2
+    // equals/hashing will be added in Stage 2
 
 }
