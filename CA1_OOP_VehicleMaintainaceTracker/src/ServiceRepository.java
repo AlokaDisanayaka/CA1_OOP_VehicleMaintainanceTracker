@@ -5,7 +5,7 @@ public class ServiceRepository {
    private final ArrayList <ServiceRecord> records= new ArrayList<>();
 
    //METHODS
-    //Add a record to thr list
+    //Add a record to the list
     public void add (ServiceRecord record)
     {
         if (record != null)
@@ -26,7 +26,7 @@ public class ServiceRepository {
         }
         else
         {
-            System.out.println("No records available in the repositary");
+            System.out.println("No records available in the repository");
 
         }
     }
@@ -181,3 +181,4 @@ public class ServiceRepository {
 
 
 }
+
