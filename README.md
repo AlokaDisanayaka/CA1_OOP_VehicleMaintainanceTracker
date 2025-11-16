@@ -22,4 +22,6 @@ This data system emphasises object oriented design principles, showcasing polymo
 5. this.vehicle = Objects.requireNonNull(vehicle, "vehicle") - This makes sure that every service record in the system has a vehicle associated with it. If the user does not enter a valid vehicle with the record, an exception is thrown in order to avoid null inputs in the system which can affect records searching.
 
 *Contribution matrix*
+Aloka has created the various classes and subclasses as well as the CSV file loading. Adhira has created the tests and documentation.
+
 *Reflection*
