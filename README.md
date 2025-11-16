@@ -21,7 +21,14 @@ This data system emphasises object oriented design principles, showcasing polymo
 
 5. this.vehicle = Objects.requireNonNull(vehicle, "vehicle") - This makes sure that every service record in the system has a vehicle associated with it. If the user does not enter a valid vehicle with the record, an exception is thrown in order to avoid null inputs in the system which can affect records searching.
 
-*Contribution matrix*
-Aloka has created the various classes and subclasses as well as the CSV file loading. Adhira has created the tests and documentation.
+*Contribution*
 
-*Reflection*
+Aloka has created the various classes and subclasses as well as the CSV file loading. Adhira has created the test classes and documentation.
+
+*Adhira's Reflection:*
+
+From working through creating the vehicle maintainence system I am gaining a deeper understanding of how abstraction and polymorphism works, the relevance of having different, flexible ways of sorting data, aswell as defensive coding through the validation checking. My focus was on working on various JUnit tests for the Service Record, Vehicle and Service Repository classes, and I understood the important role that testing has in object oriented programming. Writing the tests for cases such as null values, null vehicles or mismatched start times and dates made me aware of the errors that are to be expected to occur. I discovered that using parameterised tests make the testing process more efficient as you are able to test a method using multiple values at once. Working on this project is improving my ability to create a reliable data management system.
+
+*Aloka's reflection:*
+
+
