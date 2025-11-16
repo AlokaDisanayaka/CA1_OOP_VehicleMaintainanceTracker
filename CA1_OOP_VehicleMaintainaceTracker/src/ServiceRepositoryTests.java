@@ -4,7 +4,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -100,20 +99,170 @@ public class ServiceRepositoryTests
 
     //Sorting
     //Sort by natural order (serviceDate -> startTime -> registration)
+    @Test
+    void sort_naturalOrder()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr2);
+        repository.add(sr4);
+        repository.add(sr1);
+        repository.add(sr3);
+
+        repository.sortNatural();
+        List<ServiceRecord> expected = List.of(sr3, sr1, sr4, sr2);
+
+        for (int i=0; i < expected.size(); i++)
+        {
+            assertEquals(expected.get(i), repository.getRecords().get(i));
+        }
+    }
 
     //Sort by service cost
+    @Test
+    void sort_serviceCostAscending()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr1);
+        repository.add(sr2);
+        repository.add(sr3);
+        repository.add(sr4);
+        repository.sortByCostAscending();
+
+        List<ServiceRecord> expected = List.of(sr1, sr4, sr3, sr2);
+        assertIterableEquals(expected, repository.getRecords());
+    }
 
     //Sort by mileage descending
+    @Test
+    void sort_mileageDescending()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr1);
+        repository.add(sr2);
+        repository.add(sr3);
+        repository.add(sr4);
+        repository.sortByMileageDescending();
+
+        List<ServiceRecord> expected = List.of(sr3, sr2, sr1, sr4);
+        assertIterableEquals(expected, repository.getRecords());
+    }
 
     //Sort by owner name (A–Z)
+    @Test
+    void sort_ownerName()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr3);
+        repository.add(sr1);
+        repository.add(sr4);
+        repository.add(sr2);
+        repository.sortByOwnerName();
+
+        List<ServiceRecord> expected = List.of(sr1, sr2, sr3, sr4);
+        assertIterableEquals(expected, repository.getRecords());
+    }
 
     //Sort by vehicle model (A–Z)
+    @Test
+    void sort_vehicleModel()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr1);
+        repository.add(sr2);
+        repository.add(sr3);
+        repository.add(sr4);
+        repository.sortByVehicleModel();
+
+        List<ServiceRecord> expected = List.of(sr1, sr3, sr4, sr2);
+        assertIterableEquals(expected, repository.getRecords());
+    }
 
     //Sort by service date (most recent first)
+    @Test
+    void sort_serviceDateDescending()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr1);
+        repository.add(sr2);
+        repository.add(sr3);
+        repository.add(sr4);
+        repository.sortByDateDescending();
+
+        List<ServiceRecord> expected = List.of(sr2, sr4, sr1, sr3);
+        assertIterableEquals(expected, repository.getRecords());
+    }
+
+    //Calculate total service cost (record is empty)
+    @Test
+    void calculate_totalServiceCost_returnZero()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        assertEquals(0, repository.getTotalServiceCost());
+    }
 
     //Calculate total service cost
+    @Test
+    void calculate_totalServiceCost()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr1);
+        repository.add(sr2);
+        repository.add(sr3);
+        repository.add(sr4);
 
-    //Calculate average service cost
+        assertEquals(680, repository.getTotalServiceCost());
+    }
+
+    //Calculate average service cost (record is empty)
+    @Test
+    void average_serviceCost_returnZero()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        assertEquals(0, repository.getAverageServiceCost());
+    }
+    @Test
+    void average_serviceCost()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr1);
+        repository.add(sr2);
+        repository.add(sr3);
+        repository.add(sr4);
+
+        assertEquals(170, repository.getAverageServiceCost());
+    }
 
     //Clear all the records
+    @Test
+    void remove_allRecords()
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr1);
+        repository.add(sr2);
+        repository.removeAll();
+
+        assertEquals(0, repository.count());
+    }
+
+    //Parameterized test
+    @ParameterizedTest @ValueSource(strings = {"REG111", "REG222", "Test123"})
+    void remove_byRegistration_parameterised(String registration)
+    {
+        ServiceRepository repository = new ServiceRepository();
+        repository.add(sr1);
+        repository.add(sr2); //adding two records initially
+        int initialCount = repository.count(); //number of records before removing (2)
+        repository.removeByRegistration(registration);
+
+        if (registration.equals("REG111") || registration.equals("REG222"))
+        {
+            assertEquals(initialCount-1, repository.count()); //record removed, decrease count by 1
+        }
+        else
+        {
+            assertEquals(initialCount, repository.count());
+        }
+    }
+
+
 }
