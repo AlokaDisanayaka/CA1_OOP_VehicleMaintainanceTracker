@@ -108,6 +108,12 @@ public class ServiceRepository {
 
     }
     //sortings
+    //Added getter
+    public List<ServiceRecord> getRecords()
+    {
+        return new ArrayList<>(records);
+    }
+   
     // Sort by natural order (serviceDate => startTime => registration)
     public void sortNatural()
     {
@@ -181,4 +187,3 @@ public class ServiceRepository {
 
 
 }
-
