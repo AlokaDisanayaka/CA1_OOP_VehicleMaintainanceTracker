@@ -1,5 +1,5 @@
-public abstract class Vehicle extends RecordBase {
-
+public abstract class Vehicle extends RecordBase
+{
     private final String model;
     private final String registration;
     private final String subtype;
@@ -41,7 +41,8 @@ public abstract class Vehicle extends RecordBase {
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         String output = "";
         output =output+"-------------------------------\n";
         output =output+"Vehicle Model   : " + model + "\n";
@@ -51,4 +52,30 @@ public abstract class Vehicle extends RecordBase {
         output =output+"-------------------------------";
         return output;
     }
+
+    //Checking if registration is equal
+    //Equals
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof Vehicle))
+        {
+            return false;
+        }
+        Vehicle vehicle = (Vehicle) o;
+
+        return registration.equalsIgnoreCase(vehicle.registration);
+    }
+
+    //Hash Code
+    @Override
+    public int hashCode()
+    {
+        return registration.toLowerCase().hashCode();
+    }
+
 }
