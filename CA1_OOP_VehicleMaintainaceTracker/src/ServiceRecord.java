@@ -1,8 +1,8 @@
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
-public final class ServiceRecord extends RecordBase implements Comparable<ServiceRecord>{
-
+public final class ServiceRecord extends RecordBase implements Comparable<ServiceRecord>
+{
     //fields
     private String ownerName;
     private String workOrderId;
@@ -26,7 +26,6 @@ public final class ServiceRecord extends RecordBase implements Comparable<Servic
         this.startTime = Objects.requireNonNull(startTime, "startTime");
         this.vehicle = Objects.requireNonNull(vehicle, "vehicle");
 
-
         // the date part of startTime should match the serviceDate
         if (!startTime.toLocalDate().equals(serviceDate))
         {
@@ -34,11 +33,10 @@ public final class ServiceRecord extends RecordBase implements Comparable<Servic
         }
 
         //do not take in future service dates (as the date of service cannot be in the future)
-         if (serviceDate.isAfter(LocalDate.now()))
+        if (serviceDate.isAfter(LocalDate.now()))
         {
-           throw new IllegalArgumentException("serviceDate cannot be in the future");
+            throw new IllegalArgumentException("serviceDate cannot be in the future");
         }
-
     }
 
     //getters
@@ -74,6 +72,7 @@ public final class ServiceRecord extends RecordBase implements Comparable<Servic
     {
         return this.vehicle;
     }
+
     //compareTo
     public int compareTo(ServiceRecord other)
     {
@@ -96,23 +95,45 @@ public final class ServiceRecord extends RecordBase implements Comparable<Servic
     }
 
     //to string
-   public String toString()
-   {
-       String output = "";
-       output =output+"-------------------------------\n";
-       output =output+"Owner Name      : " + ownerName + "\n";
-       output =output+"Work Order ID   : " + workOrderId + "\n";
-       output =output+"Service Type    : " + serviceType + "\n";
-       output =output+"Service Cost    : " + serviceCost + "\n";
-       output =output+"Under Warranty  : " + underWarranty + "\n";
-       output =output+"Service Date    : " + serviceDate + "\n";
-       output =output+"Start Time      : " + startTime.toLocalTime() + "\n";
-       output =output+"Vehicle Info    : " + vehicle + "\n";
-       output =output+"-------------------------------";
-       return output;
+    public String toString()
+    {
+        String output = "";
+        output =output+"-------------------------------\n";
+        output =output+"Owner Name      : " + ownerName + "\n";
+        output =output+"Work Order ID   : " + workOrderId + "\n";
+        output =output+"Service Type    : " + serviceType + "\n";
+        output =output+"Service Cost    : " + serviceCost + "\n";
+        output =output+"Under Warranty  : " + underWarranty + "\n";
+        output =output+"Service Date    : " + serviceDate + "\n";
+        output =output+"Start Time      : " + startTime.toLocalTime() + "\n";
+        output =output+"Vehicle Info    : " + vehicle + "\n";
+        output =output+"-------------------------------";
+        return output;
 
-   }
+    }
 
-    // equals/hashing will be added in Stage 2
+    //Records with same work order id are equal
+    //Equals
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof ServiceRecord))
+        {
+            return false;
+        }
+        ServiceRecord serviceRecord = (ServiceRecord) o;
+        return workOrderId.equalsIgnoreCase(serviceRecord.workOrderId);
+    }
+
+    //Hash Code
+    @Override
+    public int hashCode()
+    {
+        return workOrderId.toLowerCase().hashCode();
+    }
 
 }
