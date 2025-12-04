@@ -52,30 +52,4 @@ public abstract class Vehicle extends RecordBase
         output =output+"-------------------------------";
         return output;
     }
-
-    //Checking if registration is equal
-    //Equals
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof Vehicle))
-        {
-            return false;
-        }
-        Vehicle vehicle = (Vehicle) o;
-
-        return registration.equalsIgnoreCase(vehicle.registration);
-    }
-
-    //Hash Code
-    @Override
-    public int hashCode()
-    {
-        return registration.toLowerCase().hashCode();
-    }
-
 }
