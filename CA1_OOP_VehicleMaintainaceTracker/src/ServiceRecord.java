@@ -111,29 +111,5 @@ public final class ServiceRecord extends RecordBase implements Comparable<Servic
         return output;
 
     }
-
-    //Records with same work order id are equal
-    //Equals
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof ServiceRecord))
-        {
-            return false;
-        }
-        ServiceRecord serviceRecord = (ServiceRecord) o;
-        return workOrderId.equalsIgnoreCase(serviceRecord.workOrderId);
-    }
-
-    //Hash Code
-    @Override
-    public int hashCode()
-    {
-        return workOrderId.toLowerCase().hashCode();
-    }
-
 }
+
