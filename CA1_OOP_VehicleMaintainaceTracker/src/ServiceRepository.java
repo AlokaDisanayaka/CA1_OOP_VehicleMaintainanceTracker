@@ -1,20 +1,46 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-public class ServiceRepository {
-    private final ArrayList <ServiceRecord> records= new ArrayList<>();
+public class ServiceRepository
+{
+    private final ArrayList <ServiceRecord> records = new ArrayList<>();
+
+    //HashSet
+    //Unique workOrderId's - Duplicate handling
+    private final HashSet<String> workOrderId_HashSet = new HashSet<>();
+
+    //HashMap
+    //Registration - Fast lookup
+    private final HashMap<String, ServiceRecord> registration_HashMap = new HashMap<>(); //One record per registration number
+    //Owner name service records list - Fast grouping
+    private final HashMap<String, List<ServiceRecord>> ownerName_HashMap = new HashMap<>(); //Group records by owner names if an owner has multiple vehicles
+    //vehicle model's list of records - Fast grouping
+    private final HashMap<String, List<ServiceRecord>> model_HashMap = new HashMap<>(); //Group vehicles by model if multiple vehicles have same model
 
     //METHODS
-    //Add a record to thr list
+    //Add a record to the list
     public void add (ServiceRecord record)
     {
-        if (record != null)
+        if (record == null)
         {
-            this.records.add(record);
+            return;
         }
+
+        //Prevent duplicate work Order Ids
+        if (workOrderId_HashSet.contains(record.getWorkOrderId()))
+        {
+            System.out.println("Duplicate work order ID skipped: " + record.getWorkOrderId());
+            return;
+        }
+
+        records.add(record);
+        workOrderId_HashSet.add(record.getWorkOrderId()); //track work order to avoid duplicates
+        registration_HashMap.put(record.getVehicle().getRegistration().toLowerCase(), record); //fast lookup by registration
+
+        ownerName_HashMap.computeIfAbsent(record.getOwnerName().toLowerCase(), k -> new ArrayList<>()).add(record); //If owner name doesn't exist then one is created and adds record to list
+        model_HashMap.computeIfAbsent(record.getVehicle().getModel().toLowerCase(), k -> new ArrayList<>()).add(record);
     }
+
     //Display all the records
     public void displayRecords()
     {
@@ -28,15 +54,94 @@ public class ServiceRepository {
         }
         else
         {
-            System.out.println("No records available in the repositary");
+            System.out.println("No records available in the repository");
 
         }
     }
-    //getter for testing
+
+    // count total number of records
+    public int count()
+    {
+        return records.size();
+    }
+
+    //remove a record by given registration
+    public void removeByRegistration(String registration)
+    {
+        ServiceRecord record = registration_HashMap.remove(registration.toLowerCase());
+
+        if (record == null)
+        {
+            System.out.println("Record NOT found: "+registration);
+            return;
+        }
+
+        //Remove record from main
+        records.remove(record);
+        //Remove Id from duplicate tracking hash set so the Id could be used again
+        workOrderId_HashSet.remove(record.getWorkOrderId());
+
+        System.out.println("Removed record: "+registration);
+    }
+
+    //find a record by registration number
+    public void findByRegistration (String registration)
+    {
+        ServiceRecord record = registration_HashMap.get(registration.toLowerCase());
+
+        if (record == null)
+        {
+            System.out.println("No record matches the registration: "+registration);
+            return;
+        }
+
+        System.out.println(record);
+    }
+
+    //find all the records that contain a part of the owners name
+    public void findByOwner (String namePart)
+    {
+        boolean name = false;
+        for (int i =0; i<records.size();i++)
+        {
+            if (this.records.get(i).getOwnerName().toLowerCase().contains(namePart.toLowerCase()))
+            {
+                name=true;
+                System.out.println(this.records.get(i));
+            }
+
+        }
+        if(!name)
+        {
+            System.out.println("NO records with "+namePart+" is found");
+        }
+    }
+
+    //find records of vehicles of a certain make
+    public void findByMake (String make)
+    {
+        boolean makeFound = false;
+        for (int i =0; i< records.size();i++)
+        {
+            if (this.records.get(i).getVehicle().getModel().toLowerCase().contains(make.toLowerCase()))
+            {
+                makeFound = true;
+                System.out.println(this.records.get(i));
+            }
+        }
+        if (!makeFound)
+        {
+            System.out.println("No records found with model containing: "+make);
+        }
+    }
+
+    //sorting
+    //Added getter
     public List<ServiceRecord> getRecords()
     {
         return new ArrayList<>(records);
     }
+
     //get all the records
     public ArrayList <ServiceRecord> getAll()
     {
@@ -49,84 +154,7 @@ public class ServiceRepository {
 
         return allRecords;
     }
-    // count total number of records
-    public int count()
-    {
-        return records.size();
-    }
-    //remove a record by given registration
-    public void removeByRegistration(String registration)
-    {
-        boolean registrartionFound=false;
-        for (int i =0;i<records.size();i++)
-        {
-            if (this.records.get(i).getVehicle().getRegistration().equalsIgnoreCase(registration))
-            {
-                registrartionFound=true;
-                records.remove(i);
-                System.out.println("Removed record:"+registration);
-            }
-        }
 
-        if (registrartionFound)
-        {
-            System.out.println("record NOT found: "+registration);
-        }
-
-    }
-    //find a record by registration number
-    public void findByRegistration (String registration)
-    {
-        boolean found = false;
-        for (int i =0;i<records.size();i++)
-        {
-            if (this.records.get(i).getVehicle().getRegistration().equalsIgnoreCase(registration))
-            {
-                found=true;
-                System.out.println(this.records.get(i));
-            }
-
-        }
-        if (found)
-        {
-            System.out.println("No records matches the registration :"+registration);
-        }
-    }
-    //find all the records that contain a part of the owners name
-    public void findByOwner (String namePart)
-    {
-        boolean name=false;
-        for (int i =0; i<records.size();i++)
-        {
-            if (this.records.get(i).getOwnerName().toLowerCase().contains(namePart.toLowerCase()))
-            {
-                name=true;
-                System.out.println(this.records.get(i));
-            }
-
-        }
-        if(name)
-        {
-            System.out.println("NO records with "+namePart+" is found");
-        }
-
-    }
-    //find records of vehicles of a certain make
-    public void findBymake (String make)
-    {
-        boolean makeFound=false;
-        for (int i =0; i< records.size();i++)
-        {
-            if (this.records.get(i).getVehicle().getModel().toLowerCase().contains(make.toLowerCase()))
-            {
-                System.out.println(this.records.get(i));
-            }
-
-        }
-
-
-    }
-    //sortings
     // Sort by natural order (serviceDate => startTime => registration)
     public void sortNatural()
     {
@@ -177,6 +205,7 @@ public class ServiceRepository {
         }
         return total;
     }
+
     // Calculate average service cost
     public double getAverageServiceCost()
     {
@@ -192,10 +221,15 @@ public class ServiceRepository {
         }
         return total / records.size();
     }
+
     //clear all the records
     public void removeAll()
     {
         this.records.clear();
+        this.registration_HashMap.clear();
+        this.ownerName_HashMap.clear();
+        this.model_HashMap.clear();
+        this.workOrderId_HashSet.clear();
     }
 
     // find the most expensive service record
@@ -212,6 +246,7 @@ public class ServiceRepository {
         return max;
 
     }
+
     //find the cheapest service record
     public ServiceRecord getCheapestService()
     {
@@ -240,6 +275,7 @@ public class ServiceRepository {
         }
         return underWarranty;
     }
+
     //get all the records belonging to a certain category
     public ArrayList <ServiceRecord> getByCategory(String category)
     {
@@ -253,6 +289,7 @@ public class ServiceRepository {
         }
         return categorized;
     }
+
     //get the records of a certain service type
     public ArrayList<ServiceRecord> getByServiceType(String type)
     {
@@ -269,6 +306,7 @@ public class ServiceRepository {
 
         return list;
     }
+
     //get all the records of a given vehicle subtype
     public ArrayList<ServiceRecord> getBySubtype(String subtype)
     {
@@ -284,6 +322,7 @@ public class ServiceRepository {
 
         return list;
     }
+
     //return the count of the services which are under warranty
     public int countWarrantyServices()
     {
@@ -299,6 +338,7 @@ public class ServiceRepository {
 
         return count;
     }
+
     //find the services within a given date range
     public ArrayList<ServiceRecord> getByDateRange(LocalDate start, LocalDate end)
     {
@@ -339,6 +379,7 @@ public class ServiceRepository {
 
         return total / count;
     }
+
     //get most frequently serviced vehicle model
     public String getMostServicedModel()
     {
@@ -367,6 +408,7 @@ public class ServiceRepository {
 
         return mostModel;
     }
+
     //get the services done before today (todays date)
     public ArrayList<ServiceRecord> getPastServices()
     {
@@ -383,6 +425,7 @@ public class ServiceRepository {
 
         return list;
     }
+
     //get total service cost by owner
     public double totalCostByOwner(String owner)
     {
@@ -398,6 +441,5 @@ public class ServiceRepository {
 
         return total;
     }
-
 
 }
