@@ -52,6 +52,15 @@ public class ServiceRecordTests
         assertTrue(s.contains(sr1.getVehicle().toString()));
     }
 
+    //underWarranty Test
+    @Test
+    void test_getUnderWarranty()
+    {
+        assertFalse(sr1.getUnderWarranty());  //false
+        assertTrue(sr2.getUnderWarranty());   //true
+    }
+
+
     //1) Comparable ordering - Natural order
     //   natural order: service date, start time, vehicle registration if date is equal to time
     @Test
@@ -67,6 +76,22 @@ public class ServiceRecordTests
         assertTrue(sr2.compareTo(sr1)>0);
         assertTrue(sr1.compareTo(sr2)<0);
     }
+
+    @Test
+    void comparable_sameDateAndTimeThenComparesByReg()
+    {
+        ServiceRecord sr1 = new ServiceRecord("OwnerName", "W005", "Service", 100, false,
+                                                LocalDate.of(2025,1,10),
+                                                LocalDateTime.of(2025,1,10,10,0), car);
+
+        ServiceRecord sr2 = new ServiceRecord("OwnerName", "W005", "Service", 100, false,
+                                                LocalDate.of(2025,1,10),
+                                                LocalDateTime.of(2025,1,10,10,0), jeep); //Same date, same time, different reg
+
+        assertTrue(sr1.compareTo(sr2)<0);
+        assertTrue(sr2.compareTo(sr1)>0);
+    }
+
 
     //2) Comparator sorting
     private List<ServiceRecord> sortByCost(List<ServiceRecord> input)
@@ -448,4 +473,20 @@ public class ServiceRecordTests
         assertTrue(set.contains(v1));
         assertTrue(set.contains(v2)); //v1 and v2 are considered the same
     }
+
+    //Service Record Test - o is not a service record
+    @Test
+    void serviceRecord_EqualsReturnsFalse()
+    {
+        assertFalse(sr1.equals("Not a service record"));
+    }
+
+    //Vehicle Test - o is not a vehicle
+    @Test
+    void vehicle_EqualsReturnsFalse()
+    {
+        Vehicle v1 = new Car("Accord", "REG111", "Sedan", 15000);
+        assertFalse(v1.equals("Not a vehicle"));
+    }
+
 }
