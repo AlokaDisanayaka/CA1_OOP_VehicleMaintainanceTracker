@@ -5,6 +5,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,13 +36,29 @@ public class ServiceRecordTests
                                                         LocalDate.of(2025,1,11),
                                                         LocalDateTime.of(2025,1,11,11,0), van);
 
+    //toString() Test
+    @Test
+    void testToString_containsAllFields()
+    {
+        String s = sr1.toString();
+
+        assertTrue(s.contains("Alice"));
+        assertTrue(s.contains(sr1.getOwnerName()));
+        assertTrue(s.contains(sr1.getWorkOrderId()));
+        assertTrue(s.contains(sr1.getServiceType()));
+        assertTrue(s.contains(String.valueOf(sr1.getServiceCost())));
+        assertTrue(s.contains(sr1.getServiceDate().toString()));
+        assertTrue(s.contains(sr1.getStartTime().toLocalTime().toString()));
+        assertTrue(s.contains(sr1.getVehicle().toString()));
+    }
+
     //1) Comparable ordering - Natural order
     //   natural order: service date, start time, vehicle registration if date is equal to time
     @Test
     void comparable_sameDateComparesByTimeThenReg()
     {
-        assertTrue(sr3.compareTo(sr1)<0);
-        assertTrue(sr1.compareTo(sr3)>0);
+        assertTrue(sr3.compareTo(sr1)<0); //comes before the other
+        assertTrue(sr1.compareTo(sr3)>0); //comes after the other
     }
 
     @Test
@@ -56,15 +73,15 @@ public class ServiceRecordTests
     {
         List<ServiceRecord> copy = new ArrayList<>(input);
         copy.sort(new Comparators.compareByCostAscending());
-        return copy;
+        return copy; //sorts a copy instead of original list
     }
 
     //Sort by cost of service (lowest -> highest)
     @Test
     void comparator_costOfServiceAscending()
     {
-        List<ServiceRecord> sorted = sortByCost(List.of(sr1,sr2,sr3,sr4));
-        assertIterableEquals(List.of(sr1,sr4,sr3,sr2), sorted);
+        List<ServiceRecord> sorted = sortByCost(List.of(sr1,sr2,sr3,sr4)); //order: 100, 150, 180, 250
+        assertIterableEquals(List.of(sr1,sr4,sr3,sr2), sorted); //checks if the order is the same in both
     }
 
     //Sort by mileage (highest -> lowest)
@@ -73,8 +90,8 @@ public class ServiceRecordTests
     {
         List<ServiceRecord> list = new ArrayList<>(List.of(sr1,sr2,sr3,sr4));
         list.sort(new Comparators.compareByMileageDescending());
-        assertEquals(sr3, list.get(0));
-        assertEquals(sr4, list.get(3));
+        assertEquals(sr3, list.get(0)); //highest mileage first
+        assertEquals(sr4, list.get(3)); //lowest mileage last
     }
 
     //Sort by owner name (alphabetically, A–Z)
@@ -140,6 +157,7 @@ public class ServiceRecordTests
         assertIterableEquals(List.of(sr3), out); //sr3 = "Cara"
     }
 
+    //Search by names With no matches
     @Test
     void search_ownerNamePrefixNoMatches()
     {
@@ -182,7 +200,7 @@ public class ServiceRecordTests
     void constructor_blankOwnerName_throws()
     {
         //empty string
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(IllegalArgumentException.class, () -> //checks that the expected exception is being thrown
         {
             new ServiceRecord(" ", "W001", "Service",100, false,
                                 LocalDate.of(2025, 1, 1),
@@ -262,5 +280,172 @@ public class ServiceRecordTests
         });
     }
 
+    //Equality
+    //Vehicle Test - vehicles with the same registration are treated as the same
+    @Test
+    void vehicle_RegistrationTest()
+    {
+        Vehicle v1 = new Car("Accord", "REG111", "Sedan", 15000);
+        Vehicle v2 = new Jeep("Wrangler", "REG111", "Sport", 20000);
+        assertTrue(v1.equals(v2));
+    }
 
+    //Vehicle Test - vehicles with different registration are not equal
+    @Test
+    void vehicle_DifferentRegistrationTest()
+    {
+        Vehicle v1 = new Car("Accord", "REG111", "Sedan", 15000);
+        Vehicle v2 = new Jeep("Wrangler", "REG222", "Sport", 20000);
+        assertFalse(v1.equals(v2));
+    }
+
+    //Service Record Test - records with the same work order id are treated the same
+    @Test
+    void serviceRecord_WorkIDTest()
+    {
+        ServiceRecord sr1 = new ServiceRecord("Alice", "W001", "Oil", 100.0, false,
+                                                LocalDate.of(2025,1,10),
+                                                LocalDateTime.of(2025,1,10,10,0), car);
+        ServiceRecord sr2 = new ServiceRecord("Bob", "W001", "Tyres", 250.0, true,
+                                                LocalDate.of(2025,1,12),
+                                                LocalDateTime.of(2025,1,12,9,30), jeep);
+        assertTrue(sr1.equals(sr2));
+    }
+
+    //Service Record Test - records with different work order id are not equal
+    @Test
+    void serviceRecord_DifferentWorkIDTest()
+    {
+        ServiceRecord sr1 = new ServiceRecord("Alice", "W001", "Oil", 100.0, false,
+                                                LocalDate.of(2025,1,10),
+                                                LocalDateTime.of(2025,1,10,10,0), car);
+        ServiceRecord sr2 = new ServiceRecord("Bob", "W002", "Tyres", 250.0, true,
+                                                LocalDate.of(2025,1,12),
+                                                LocalDateTime.of(2025,1,12,9,30), jeep);
+        assertFalse(sr1.equals(sr2));
+    }
+
+
+    //Hashing
+    //Vehicle Test - vehicles with the same registration hash code are treated as the same
+    @Test
+    void vehicle_HashCodeTest()
+    {
+        Vehicle v1 = new Car("Accord", "REG111", "Sedan", 15000);
+        Vehicle v2 = new Jeep("Wrangler", "REG111", "Sport", 20000);
+        assertEquals(v1.hashCode(), v2.hashCode());
+    }
+
+    //Vehicle Test - vehicles with different registration hash code are not equal
+    @Test
+    void vehicle_DifferentHashCodeTest()
+    {
+        Vehicle v1 = new Car("Accord", "REG111", "Sedan", 15000);
+        Vehicle v2 = new Jeep("Wrangler", "REG222", "Sport", 20000);
+        assertNotEquals(v1.hashCode(), v2.hashCode());
+    }
+
+    //Service Record Test - records with the same work id hash code are treated as the same
+    @Test
+    void serviceRecord_HashCodeTest()
+    {
+        ServiceRecord sr1 = new ServiceRecord("Alice", "W001", "Oil", 100.0, false,
+                                                LocalDate.of(2025,1,10),
+                                                LocalDateTime.of(2025,1,10,10,0), car);
+        ServiceRecord sr2 = new ServiceRecord("Bob", "W001", "Tyres", 250.0, true,
+                                                LocalDate.of(2025,1,12),
+                                                LocalDateTime.of(2025,1,12,9,30), jeep);
+
+        assertEquals(sr1.hashCode(), sr2.hashCode());
+    }
+
+    //Service Record Test - records with the same work id hash code are treated as the same
+    @Test
+    void serviceRecord_DifferentHashCodeTest()
+    {
+        ServiceRecord sr1 = new ServiceRecord("Alice", "W001", "Oil", 100.0, false,
+                                                LocalDate.of(2025,1,10),
+                                                LocalDateTime.of(2025,1,10,10,0), car);
+        ServiceRecord sr2 = new ServiceRecord("Bob", "W002", "Tyres", 250.0, true,
+                                                LocalDate.of(2025,1,12),
+                                                LocalDateTime.of(2025,1,12,9,30), jeep);
+
+        assertNotEquals(sr1.hashCode(), sr2.hashCode());
+    }
+
+    //Equals
+    //Service Record Test - Equals is reflexive
+    @Test
+    void serviceRecord_EqualsTest()
+    {
+        assertTrue(sr1.equals(sr1));
+    }
+
+    //Service Record Test - Both directions match
+    @Test
+    void serviceRecord_EqualsSymmetricTest()
+    {
+        ServiceRecord sr1 = new ServiceRecord("Alice", "W001", "Oil", 100.0, false,
+                                                LocalDate.of(2025,1,10),
+                                                LocalDateTime.of(2025,1,10,10,0), car);
+        ServiceRecord sr2 = new ServiceRecord("Bob", "W001", "Tyres", 250.0, true,
+                                                LocalDate.of(2025,1,12),
+                                                LocalDateTime.of(2025,1,12,9,30), jeep);
+
+        assertTrue(sr1.equals(sr2) && sr2.equals(sr1));
+    }
+
+    //Vehicle Test - Equals is reflexive
+    @Test
+    void vehicle_EqualsTest()
+    {
+        Vehicle v1 = new Car("Accord", "REG111", "Sedan", 15000);
+        assertTrue(v1.equals(v1));
+    }
+
+    //Vehicle Test - Both directions match
+    @Test
+    void vehicle_EqualsSymmetricTest()
+    {
+        Vehicle v1 = new Car("Accord", "REG111", "Sedan", 15000);
+        Vehicle v2 = new Jeep("Wrangler", "REG111", "Sport", 20000);
+
+        assertTrue(v1.equals(v2) && v2.equals(v1));
+    }
+
+    //Service Record Test - Duplicate records aren't added
+    @Test
+    void serviceRecord_PreventDuplicateRecordAddition()
+    {
+        ServiceRecord sr1 = new ServiceRecord("Alice", "W001", "Oil", 100.0, false,
+                                                LocalDate.of(2025,1,10),
+                                                LocalDateTime.of(2025,1,10,10,0), car);
+        ServiceRecord sr2 = new ServiceRecord("Bob", "W001", "Tyres", 250.0, true,
+                                                LocalDate.of(2025,1,12),
+                                                LocalDateTime.of(2025,1,12,9,30), jeep);
+
+        HashSet<ServiceRecord> set = new HashSet<>();
+        set.add(sr1);
+        set.add(sr2); //Has same workOrderId, should not add
+
+        assertEquals(1, set.size());
+        assertTrue(set.contains(sr1));
+        assertTrue(set.contains(sr2)); //sr1 and sr2 are considered the same
+    }
+
+    //Vehicle Test - Duplicate vehicles aren't added
+    @Test
+    void vehicle_PreventDuplicateVehicleAddition()
+    {
+        Vehicle v1 = new Car("Accord", "REG111", "Sedan", 15000);
+        Vehicle v2 = new Jeep("Wrangler", "REG111", "Sport", 20000);
+
+        HashSet<Vehicle> set = new HashSet<>();
+        set.add(v1);
+        set.add(v2); //Has same registration ,shouldn't be added
+
+        assertEquals(1, set.size());
+        assertTrue(set.contains(v1));
+        assertTrue(set.contains(v2)); //v1 and v2 are considered the same
+    }
 }
