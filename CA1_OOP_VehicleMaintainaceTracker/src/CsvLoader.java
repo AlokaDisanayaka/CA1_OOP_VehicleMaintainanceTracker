@@ -16,7 +16,8 @@ public class CsvLoader {
         this.repository = repository;
     }
 
-    public void loadSampleData() {
+    public void loadSampleData(int maxRows) {
+        int invalidCount = 0;
         int validCount = 0;
         int totalCount = 0;
 
@@ -24,7 +25,7 @@ public class CsvLoader {
             String line;
 
             // Read up to 10 lines
-            while ((line = br.readLine()) != null && validCount < 10) {
+            while ((line = br.readLine()) != null && totalCount < maxRows) {
                 totalCount++;
                 if (line.trim().isEmpty())
                 {
@@ -77,7 +78,9 @@ public class CsvLoader {
                     validCount++;
 
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
+                    invalidCount++;
                     System.out.println("Invalid data on line " + totalCount + ": " + e.getMessage());
                 }
             }
@@ -85,6 +88,7 @@ public class CsvLoader {
             System.out.println("\nCSV load complete!");
             System.out.println("Total lines read: " + totalCount);
             System.out.println("Valid records added: " + validCount);
+            System.out.println("Invalid records  : " + invalidCount);
             System.out.println("\n--- Sample Listing ---");
             for (int i = 0; i < repository.getAll().size(); i++)
             {
