@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+
 public abstract class Vehicle extends RecordBase {
 
     private final String model;
@@ -76,5 +78,58 @@ public abstract class Vehicle extends RecordBase {
     {
         return registration.toLowerCase().hashCode();
     }
+
+    //new enhancer methods for stage 2
+
+    //find all high mileage vehicles
+    public boolean isHighMileage()
+    {
+        return mileage > 150_000;
+    }
+
+    //get the vehicle age based on the registration year
+    public int getVehicleAge()
+    {
+        try
+        {
+            String[] parts = registration.split("-");
+            int year = Integer.parseInt(parts[0]);
+            int fullYear = 2000 + year;
+            return LocalDate.now().getYear() - fullYear;
+        }
+        catch (Exception e)
+        {
+            return -1; //invalid registration format
+        }
+    }
+
+    //check whether electric or hybrid
+    public boolean isElectricOrHybrid()
+    {
+        String lowerM = model.toLowerCase();
+        return lowerM.contains("electric")
+                || lowerM.contains("hybrid")
+                || lowerM.contains("ev")
+                || lowerM.contains("tesla");
+    }
+
+    //assign mileage category (low,medium,low)
+    public String getMileageCategory()
+    {
+        if (mileage < 80_000)
+        {
+            return "LOW";
+        }
+        else if (mileage < 150_000)
+        {
+            return "MEDIUM";
+        }
+        else
+        {
+            return "HIGH";
+        }
+
+    }
+
 
 }
