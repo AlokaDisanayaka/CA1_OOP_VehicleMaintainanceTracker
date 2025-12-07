@@ -3,9 +3,10 @@ public class MainApp {
     {
         ServiceRepository repo = new ServiceRepository();
 
-        CsvLoader loader = new CsvLoader("sample_10.csv", repo);
+        CsvLoader loader = new CsvLoader("dataset_1000.csv", repo);
+        int maxRows=1000;
 
-        loader.loadSampleData();
+        loader.loadSampleData(maxRows);
 
         System.out.println("\n--- Printing Records ---");
         for (int i=0;i<repo.getAll().size();i++)
