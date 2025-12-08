@@ -443,7 +443,7 @@ public class ServiceRepositoryTests
 
     //Get all the records that are Not under warranty
     @Test
-    void get_UnderWarranty()
+    void get_NotUnderWarranty()
     {
         ServiceRepository repository = new ServiceRepository();
         repository.add(sr1);
@@ -451,7 +451,7 @@ public class ServiceRepositoryTests
         repository.add(sr3);
         repository.add(sr4);
 
-        ArrayList<ServiceRecord> result = repository.getUnderWarranty();
+        ArrayList<ServiceRecord> result = repository.getNotUnderWarranty();
         assertEquals(2, result.size()); //two (sr1, sr3) that arent under warranty
         assertTrue(result.contains(sr1)); //checking the two records
         assertTrue(result.contains(sr3));
