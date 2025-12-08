@@ -11,7 +11,7 @@ public class ServiceRepository
 
     //HashMap
     //Registration - Fast lookup
-    private final HashMap<String, ServiceRecord> registration_HashMap = new HashMap<>(); //One record per registration number
+    private final HashMap<String, List<ServiceRecord>> registration_HashMap = new HashMap<>();//One record per registration number
     //Owner name service records list - Fast grouping
     private final HashMap<String, List<ServiceRecord>> ownerName_HashMap = new HashMap<>(); //Group records by owner names if an owner has multiple vehicles
     //vehicle model's list of records - Fast grouping
@@ -35,7 +35,11 @@ public class ServiceRepository
 
         records.add(record);
         workOrderId_HashSet.add(record.getWorkOrderId()); //track work order to avoid duplicates
-        registration_HashMap.put(record.getVehicle().getRegistration().toLowerCase(), record); //fast lookup by registration
+        String regKey = record.getVehicle().getRegistration().toLowerCase();
+
+        registration_HashMap
+                .computeIfAbsent(regKey, k -> new ArrayList<>()) //computeIfAbsent creates a new list if the key doesnt exist. if key exists returns existing list.
+                .add(record); //then add record
 
         ownerName_HashMap.computeIfAbsent(record.getOwnerName().toLowerCase(), k -> new ArrayList<>()).add(record); //If owner name doesn't exist then one is created and adds record to list
         model_HashMap.computeIfAbsent(record.getVehicle().getModel().toLowerCase(), k -> new ArrayList<>()).add(record);
@@ -68,65 +72,46 @@ public class ServiceRepository
     //remove a record by given registration
     public void removeByRegistration(String registration)
     {
-        ServiceRecord record = registration_HashMap.remove(registration.toLowerCase());
+        String key = registration.toLowerCase();
+        List<ServiceRecord> list = registration_HashMap.remove(key);
 
-        if (record == null)
-        {
-            System.out.println("Record NOT found: " + registration);
+        if (list == null || list.isEmpty()) {
+            System.out.println("No records found: " + registration);
             return;
         }
 
-        // Remove from main list
-        records.remove(record);
+        // remove each record from other structures
+        for (ServiceRecord record : list) {
 
-        // Remove ID from duplicate tracking set
-        workOrderId_HashSet.remove(record.getWorkOrderId());
+            records.remove(record);
+            workOrderId_HashSet.remove(record.getWorkOrderId());
 
-        // Remove from ownerName_HashMap
-        String ownerKey = record.getOwnerName().toLowerCase();
-        List<ServiceRecord> ownerList = ownerName_HashMap.get(ownerKey);
-
-        if (ownerList != null)
-        {
-            ownerList.remove(record);
-
-            // If the list becomes empty, remove the key to clean map
-            if (ownerList.isEmpty())
-            {
-                ownerName_HashMap.remove(ownerKey);
-            }
+            // Remove from ownerName_HashMap
+            ownerName_HashMap.get(record.getOwnerName().toLowerCase()).remove(record);
+            // Remove from model_HashMap
+            model_HashMap.get(record.getVehicle().getModel().toLowerCase()).remove(record);
         }
 
-        // Remove from model_HashMap
-        String modelKey = record.getVehicle().getModel().toLowerCase();
-        List<ServiceRecord> modelList = model_HashMap.get(modelKey);
+        System.out.println("Removed ALL records for registration: " + registration);
 
-        if (modelList != null)
-        {
-            modelList.remove(record);
-
-            if (modelList.isEmpty())
-            {
-                model_HashMap.remove(modelKey);
-            }
-        }
-
-        System.out.println("Removed record: " + registration);
     }
 
 
     //find a record by registration number
     public void findByRegistration (String registration)
     {
-        ServiceRecord record = registration_HashMap.get(registration.toLowerCase());
+        List<ServiceRecord> list = registration_HashMap.get(registration.toLowerCase());
 
-        if (record == null)
+        if (list == null || list.isEmpty())
         {
-            System.out.println("No record matches the registration: "+registration);
+            System.out.println("No records found for registration: " + registration);
             return;
         }
 
-        System.out.println(record);
+        for (int i = 0; i < list.size(); i++)
+        {
+            System.out.println(list.get(i));
+        }
     }
 
     //find all the records that contain a part of the owners name
