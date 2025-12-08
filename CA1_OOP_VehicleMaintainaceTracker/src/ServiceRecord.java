@@ -136,4 +136,53 @@ public final class ServiceRecord extends RecordBase implements Comparable<Servic
         return workOrderId.toLowerCase().hashCode();
     }
 
+
+    //enhancement methods for stage 2
+
+    //return true if the service eas done within last 90 days
+    public boolean isRecentService()
+    {
+        return serviceDate.isAfter(LocalDate.now().minusDays(90));
+    }
+
+    //categorize the records based on the cost
+    public String getCostCategory()
+    {
+        if (serviceCost < 200)
+        {
+            return "LOW";
+        }
+        if (serviceCost < 600)
+        {
+            return "MEDIUM";
+        }
+        else {
+            return "HIGH";
+        }
+    }
+
+    //check whether the record is under warranty or not
+    public boolean isUnderWarrantyService()
+    {
+        return underWarranty;
+    }
+
+    //return the year service was done
+    public int getServiceYear()
+    {
+        return serviceDate.getYear();
+    }
+
+    //checks if s work order ID begins with a certain set of letters or numbers
+    public boolean matchesWorkOrderPrefix(String prefix)
+    {
+        return workOrderId.toLowerCase().startsWith(prefix.toLowerCase());
+    }
+
+    //check whether a given vehicle is the same as the vehicle present
+    public boolean isSameVehicle(String registration)
+    {
+        return vehicle.getRegistration().equalsIgnoreCase(registration);
+    }
+
 }
