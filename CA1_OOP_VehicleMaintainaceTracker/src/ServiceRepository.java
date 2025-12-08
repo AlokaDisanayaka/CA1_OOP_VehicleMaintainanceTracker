@@ -72,17 +72,48 @@ public class ServiceRepository
 
         if (record == null)
         {
-            System.out.println("Record NOT found: "+registration);
+            System.out.println("Record NOT found: " + registration);
             return;
         }
 
-        //Remove record from main
+        // Remove from main list
         records.remove(record);
-        //Remove Id from duplicate tracking hash set so the Id could be used again
+
+        // Remove ID from duplicate tracking set
         workOrderId_HashSet.remove(record.getWorkOrderId());
 
-        System.out.println("Removed record: "+registration);
+        // Remove from ownerName_HashMap
+        String ownerKey = record.getOwnerName().toLowerCase();
+        List<ServiceRecord> ownerList = ownerName_HashMap.get(ownerKey);
+
+        if (ownerList != null)
+        {
+            ownerList.remove(record);
+
+            // If the list becomes empty, remove the key to clean map
+            if (ownerList.isEmpty())
+            {
+                ownerName_HashMap.remove(ownerKey);
+            }
+        }
+
+        // Remove from model_HashMap
+        String modelKey = record.getVehicle().getModel().toLowerCase();
+        List<ServiceRecord> modelList = model_HashMap.get(modelKey);
+
+        if (modelList != null)
+        {
+            modelList.remove(record);
+
+            if (modelList.isEmpty())
+            {
+                model_HashMap.remove(modelKey);
+            }
+        }
+
+        System.out.println("Removed record: " + registration);
     }
+
 
     //find a record by registration number
     public void findByRegistration (String registration)
