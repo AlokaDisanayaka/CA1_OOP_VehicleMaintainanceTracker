@@ -220,6 +220,26 @@ public class ServiceRecordTests
         assertEquals(cost, sr.getServiceCost()); //checks that the cost is correct
     }
 
+    //Parameterised Test - running the test multiple times with negative values and large values
+    @ParameterizedTest @ValueSource(ints = {0, -1, -50, 1000000})
+    void serviceCost_EdgeCaseTest(int cost)
+    {
+        if (cost<=0) //negative values
+        {
+            assertThrows(IllegalArgumentException.class, () ->
+                    new ServiceRecord("Test", "W999", "Service", cost, false,
+                                        LocalDate.of(2025,1,1),
+                                        LocalDateTime.of(2025,1,1,10,0), car));
+        }
+        else //large values
+        {
+            assertDoesNotThrow(() ->
+                    new ServiceRecord("Test", "W999", "Service", cost, false,
+                            LocalDate.of(2025,1,1),
+                            LocalDateTime.of(2025,1,1,10,0), car));
+        }
+    }
+
     //Test if an owner name is blank
     @Test
     void constructor_blankOwnerName_throws()
@@ -490,3 +510,4 @@ public class ServiceRecordTests
     }
 
 }
+
