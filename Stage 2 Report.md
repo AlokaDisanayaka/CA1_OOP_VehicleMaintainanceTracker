@@ -110,7 +110,13 @@ Reflexive and symmetric tests are included in the tests as they check that the e
 
 I carried out the JUnit tests, covering the functionalities in the ServiceRecord and ServiceRepository classes in our system. These tests were made to validate constructors, sorting, and making sure that every method was working as intended. Keeping defensive coding in mind, I made sure to test invalid and edge cases, for example blank inputs and duplicate data. Adding equality and hashing verified that objects are being compared correctly, making our system more reliable. From working on this project I improved my defensive coding and testing skills. I have a further understanding of the importance of thorough testing, reminding myself to always anticipate unsual conditions. From working on this project, I better understand object orienteted design principles and improved my coding skills.
 
+*Aloka's Reflection:*
 
+In Stage 2, my main focus was on extending the system so it could handle a larger dataset and more advanced functionality. One of my key contributions was updating the CSV loading process so that the system can load 1000 rows of sample service records without crashing.
+I also added several enhancement methods to both the Vehicle and ServiceRecord classes. These methods allow the program to perform useful checks such as identifying high-mileage vehicles, categorising service costs, checking recent service dates, and grouping vehicles by age or mileage category. These additions made the data model more powerful and allowed the repository to run more complex queries.
+For the repository, I implemented and extended multiple advanced queries. This includes date-range searches, finding best and worst style queries (finding most expensive or cheapest services), cost analysis, subtype/category filtering, and frequency checks such as finding the most serviced model. I added more queries than the minimum requirement because they helped me understand how to work with large collections and different filtering rules.
+I contributed in improving the HashSet and HashMap usage. The HashSet is now used to detect and prevent duplicate work order IDs during the load process. I also redesigned the registration HashMap so that each registration stores a list of service records, not just one. 
+Throughout Stage 2, I applied defensive coding principles by checking for null values, validating inputs, and avoiding crashes when loading large datasets. Overall, Stage 2 helped me strengthen my understanding of Java collections, hashing, and building scalable data structures, and I am happy with the improvements I contributed to the system.
 
 ## 5. Commit Contributions
 We have worked on this project together at the same time, dividing the tasks between us. We would take turns adding commits to the repository. We would go through the work we have did with each other to verify that there is mutual understanding of the code before committing it. This is also to make sure that we both have the most updated version of the project and we are not working with and adding to unfinished code.
@@ -125,6 +131,9 @@ Oracle, 2014.*HashMap (Java Platform SE 8).*[online] Available at: https://docs.
 Baeldung - Java equals() and hashCode() Contracts
 Baeldung, 2020.*Java equals() and hashCode() Contracts.*[online] Available at: https://www.baeldung.com/java-equals-hashcode-contracts [Accessed November-December 2025].
 
+LabEX - Reading from a CSV file 
+LabEx Technology Limited. (n.d.) How to Read a CSV File in Java.*[online] Available at: https://labex.io/tutorials/java-reading-a-csv-file-117982 [Accessed November-December 2025].
+ 
 ## 7. Implementation Matrix (Y/N)
 
 | Component | Implemented? | Notes |
