@@ -263,17 +263,17 @@ public class ServiceRepository
     }
 
     //get all the records that are Not under wararnty
-    public ArrayList <ServiceRecord> getUnderWarranty()
+    public ArrayList <ServiceRecord> getNotUnderWarranty()
     {
-        ArrayList<ServiceRecord> underWarranty = new ArrayList<>();
+        ArrayList<ServiceRecord> notUnderWarranty = new ArrayList<>();
         for(int i =0;i<records.size();i++)
         {
             if (!this.records.get(i).getUnderWarranty())
             {
-                underWarranty.add(this.records.get(i));
+                notUnderWarranty.add(this.records.get(i));
             }
         }
-        return underWarranty;
+        return notUnderWarranty;
     }
 
     //get all the records belonging to a certain category
